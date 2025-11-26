@@ -8,23 +8,21 @@ services:
       - "9092:9092"
     environment:
       KAFKA_KRAFT_MODE: 'true' # for R Kraft
-      CLUSTER_ID: "kvBPR2BIRvejt8V2SkB1-Q
-"
-      #:only one cluster we are ising here.. .  random arbitary id , brokers -->cluster these are connected by node
+      CLUSTER_ID: "kvBPR2BIRvejt8V2SkB1-Q"
+      #:only one cluster we are ising here..random arbitary id , brokers -->cluster these are connected by node
       KAFKA_NODE_ID: 1 # node id ...we are having only one node here...one broker
 
       KAFKA_PROCESS_ROLES: broker,controller #for the node we are defining above..what all it is managing
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093 # which brokers/controller can vote during any kinda cluster decisions.node_id@conainer_name
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1 #one copy of the metadata...RAID like. yea as we have one node
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093 #open for two ports...endpoints..2. within brokers 1. consumers and producers
-      KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092 #kafka tells explicitly to the clients to communicate btwn kafka and the clients
-      KAFKA_CONTROLLER_ADVERTISED_LISTENERS: CONTROLLER://kafka:9093 #this is same as above for the explcitly btw kakfka and broker
-      KAFKA_LOG_DIR: /tmp/kraft-combined-logs #which tells kafka where to store all the datas ..on computers disk
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT"
-
+      KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER" #which broker's port handles the controller comm
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092 # port for comm btw the external and kafka
+      KAFKA_CONTROLLER_ADVERTISED_LISTENERS: CONTROLLER://kafka:9093 #this e for the internal communication,explicitly btw brokers..tho we ahve 1 here..to satisfy kraft.
+      KAFKA_LOG_DIR: /tmp/kraft-combined-logs #which tells kafka where to store all the datas..on computers disk
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT" #mapping listener names to security protocols.(means how ill they comm thro wht? here plain text)
     volumes:
-      - kafka_kraft:/var/lib/kafka/data  #kafka data(here pasted) path inside the conatiner..but actually data is stored outside the cintainer in kafka_data volumje
+      - kafka_kraft:/var/lib/kafka/data  #kafka data(here pasted) path inside the container..but actually data is stored outside the container in kafka_data volume
 
 volumes:
   kafka_kraft:
